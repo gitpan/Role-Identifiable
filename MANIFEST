@@ -8,5 +8,8 @@ README
 dist.ini
 lib/Role/Identifiable/HasIdent.pm
 lib/Role/Identifiable/HasTags.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
 t/idents.t
-t/release-pod-syntax.t
+xt/release/changes_has_content.t
+xt/release/pod-syntax.t
