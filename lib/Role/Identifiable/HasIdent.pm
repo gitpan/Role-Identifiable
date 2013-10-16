@@ -1,6 +1,6 @@
 package Role::Identifiable::HasIdent;
 {
-  $Role::Identifiable::HasIdent::VERSION = '0.006';
+  $Role::Identifiable::HasIdent::VERSION = '0.007';
 }
 use Moose::Role;
 # ABSTRACT: a thing with an ident attribute
@@ -28,7 +28,7 @@ Role::Identifiable::HasIdent - a thing with an ident attribute
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

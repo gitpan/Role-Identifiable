@@ -1,40 +1,49 @@
 use strict;
 use warnings;
 
-# This test was generated via Dist::Zilla::Plugin::Test::Compile 2.018
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.036
 
-use Test::More 0.88;
+use Test::More 0.94 tests => 2;
 
 
 
-use Capture::Tiny qw{ capture };
-
-my @module_files = qw(
-Role/Identifiable/HasIdent.pm
-Role/Identifiable/HasTags.pm
+my @module_files = (
+    'Role/Identifiable/HasIdent.pm',
+    'Role/Identifiable/HasTags.pm'
 );
 
-my @scripts = qw(
 
-);
 
 # no fake home requested
+
+my $inc_switch = q[-Mblib];
+
+use File::Spec;
+use IPC::Open3;
+use IO::Handle;
 
 my @warnings;
 for my $lib (@module_files)
 {
-    my ($stdout, $stderr, $exit) = capture {
-        system($^X, '-Mblib', '-e', qq{require q[$lib]});
-    };
+    # see L<perlfaq8/How can I capture STDERR from an external command?>
+    open my $stdin, '<', File::Spec->devnull or die "can't open devnull: $!";
+    my $stderr = IO::Handle->new;
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
+    binmode $stderr, ':crlf' if $^O eq 'MSWin32';
+    my @_warnings = <$stderr>;
+    waitpid($pid, 0);
     is($?, 0, "$lib loaded ok");
-    warn $stderr if $stderr;
-    push @warnings, $stderr if $stderr;
+
+    if (@_warnings)
+    {
+        warn @_warnings;
+        push @warnings, @_warnings;
+    }
 }
 
 
 
-is(scalar(@warnings), 0, 'no warnings found') if $ENV{AUTHOR_TESTING};
+# no warning checks;
 
-
-
-done_testing;
+BAIL_OUT("Compilation problems") if !Test::More->builder->is_passing;
